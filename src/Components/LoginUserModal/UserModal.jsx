@@ -70,13 +70,15 @@ export default function UserModalComp({ open, setOpen, handleOpen }) {
         <DialogBody>
           <form onSubmit={handleSubmitUserName(onSubmitUserName)}>
             <div className="flex flex-col justify-center items-start">
-              <InputComp
-                inputType="text"
-                inputPlaceholder="Change your username"
-                {...changeUserName("userName", {
-                  required: "Username is required.",
-                })}
-              />
+              <div className="w-full">
+                <InputComp
+                  inputType="text"
+                  inputPlaceholder="Change your username"
+                  {...changeUserName("userName", {
+                    required: "Username is required.",
+                  })}
+                />
+              </div>
               {errorsSubmitUserName.userName && (
                 <Typography color="red" className="text-sm font-medium">
                   {errorsSubmitUserName.userName.message}
@@ -92,13 +94,20 @@ export default function UserModalComp({ open, setOpen, handleOpen }) {
             className="mt-6"
           >
             <div className="flex flex-col justify-center items-start gap-2">
-              <InputComp
-                inputType="password"
-                inputPlaceholder="Type your password"
-                {...changeUserPassword("userPassword", {
-                  required: "Password is required.",
-                })}
-              />
+              <div className="w-full">
+                <InputComp
+                  inputType="password"
+                  inputPlaceholder="Type your password"
+                  {...changeUserPassword("userPassword", {
+                    required: "Password is required and.",
+                    pattern: {
+                      value: /^(?=.*[A-Z])[0-9A-Z]{8,10}$/,
+                      message:
+                        "Password must be at least 8 to 10 characters long with at least one UpperCase letter",
+                    },
+                  })}
+                />
+              </div>
               {errorsSubmitUserPassword.userPassword && (
                 <Typography color="red" className="text-sm font-medium">
                   {errorsSubmitUserPassword.userPassword.message}

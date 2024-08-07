@@ -223,8 +223,7 @@ function UserSignupPage() {
                     {...registerSignIn("userSigninPassword", {
                       required: "Password is required.",
                       minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters long",
+                        message: "Invalid password",
                       },
                     })}
                   />

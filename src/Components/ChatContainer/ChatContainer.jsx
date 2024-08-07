@@ -14,15 +14,13 @@ import {
   Loader,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { formatDistance } from "date-fns";
-import { RiLogoutCircleLine, RiInformationLine } from "react-icons/ri";
-import { IoChevronBackSharp } from "react-icons/io5";
+import { RiLogoutCircleLine } from "react-icons/ri";
 import {
   auth,
   signOut,
   collection,
-  getDocs,
   query,
   getDoc,
   where,
@@ -39,6 +37,9 @@ import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import UserModalComp from "../LoginUserModal/UserModal";
+import { Tooltip } from "react-tooltip";
+import { IoSettingsOutline } from "react-icons/io5";
+import { MdDelete } from "react-icons/md";
 
 function UserChat() {
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -56,6 +57,8 @@ function UserChat() {
   const navigate = useNavigate();
   const [value] = useDebounce(messageInputValue, 2000);
   const [open, setOpen] = useState(false);
+  const [searchUser, setSearchUser] = useState("");
+  const [filteredChats, setFilteredChats] = useState([]);
   const user = useUserContext();
 
   useEffect(() => {
@@ -210,7 +213,21 @@ function UserChat() {
     }
   };
 
+  //Modal Fn
   const handleOpen = () => setOpen(!open);
+
+  //Searching user
+  useEffect(() => {
+    if (searchUser === "") {
+      setFilteredChats(chats);
+    } else {
+      setFilteredChats(
+        chats.filter((chat) =>
+          chat.userName.toLowerCase().includes(searchUser.toLowerCase())
+        )
+      );
+    }
+  }, [searchUser, chats]);
 
   // Showing loader
   if (loading) {
@@ -220,7 +237,6 @@ function UserChat() {
       </div>
     );
   }
-  console.log("chats", chats);
 
   return (
     <div
@@ -237,24 +253,37 @@ function UserChat() {
               name={`${loginUser.userName}`}
             />
             <ConversationHeader.Content userName={`${loginUser.userName}`} />
-            <ConversationHeader.Actions className="flex justify-center items-center gap-1">
+            <ConversationHeader.Actions className="flex justify-center items-center gap-2">
               <RiLogoutCircleLine
                 onClick={logout}
+                data-tooltip-id="logoutTooltip"
+                data-tooltip-content="Logout"
                 className="text-sertiary"
                 cursor={"pointer"}
+                data-tip
+                data-for="logoutTip"
                 size={30}
               />
-              <RiInformationLine
+              <Tooltip id="logoutTooltip" />
+              <IoSettingsOutline
                 onClick={handleOpen}
+                data-tooltip-id="infoTooltip"
+                data-tooltip-content="Accout Settings"
                 className="text-sertiary"
                 cursor={"pointer"}
                 size={30}
               />
+              <Tooltip id="infoTooltip" />
             </ConversationHeader.Actions>
           </ConversationHeader>
-          <Search placeholder="Search..." />
+          <Search
+            placeholder="Search..."
+            value={searchUser}
+            onClearClick={() => setSearchUser("")}
+            onChange={(e) => setSearchUser(e)}
+          />
           <ConversationList>
-            {chats.map((v) => (
+            {filteredChats.map((v) => (
               <Conversation
                 style={{
                   backgroundColor:
@@ -317,7 +346,6 @@ function UserChat() {
               </Message>
             ))}
           </MessageList>
-
           <MessageInput
             placeholder="Type message here..."
             value={messageInputValue}
