@@ -9,7 +9,14 @@ export default withMT({
     "path-to-your-node_modules/@material-tailwind/react/theme/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    colors: {},
+    colors: {
+      primary: "#123D82",
+      secondary: "#092A5D",
+      tertiary: "#4A79CA",
+      pertiary: "#9AB3E3",
+      certiary: "#212121",
+      sertiary: "#f3f3f3",
+    },
     extend: {},
   },
   plugins: [],

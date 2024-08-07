@@ -1,11 +1,69 @@
+@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 // Variables
-
 $bodyBgColor: #f3f3f3;
+$primary: "#123D82";
+$secondary: "#092A5D";
+$tertiary: "#4A79CA";
+$pertiary: "#9AB3E3";
+$certiary: "#212121";
+$sertiary: "#f3f3f3";
+
+* {
+  font-family: "Red Hat Display" !important;
+}
 
 body {
   background-color: $bodyBgColor;
+}
+
+//Form Css
+.mainForm {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+.backBtn {
+  color: #f3f3f3 !important;
+}
+
+//Chat Css
+.cs-conversation-header,
+.cs-conversation-header__content .cs-conversation-header__user-name {
+  background-color: #092a5d !important;
+  color: #f3f3f3;
+}
+
+.cs-message--outgoing .cs-message__content {
+  background-color: #4a79ca !important;
+  color: #f3f3f3;
+}
+
+.cs-message--outgoing .cs-message__sent-time {
+  display: block !important;
+}
+
+.cs-message--incoming .cs-message__sent-time {
+  display: block !important;
+}
+
+//Loader Css
+.cs-loader {
+  font-size: 50px !important;
+}
+.cs-loader::before {
+  border-color: #9ab3e3 !important;
+}
+.cs-loader::after {
+  border-color: #4a79ca transparent transparent !important;
+}
+
+//Media Queries
+@media screen and (max-width: 400px) {
+  .formPadding {
+    padding: 4px !important;
+  }
 }
