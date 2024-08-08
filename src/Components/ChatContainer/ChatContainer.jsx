@@ -1,20 +1,4 @@
-import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  Sidebar,
-  Search,
-  Conversation,
-  Avatar,
-  ConversationList,
-  ConversationHeader,
-  Loader,
-  TypingIndicator,
-} from "@chatscope/chat-ui-kit-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { formatDistance } from "date-fns";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import {
@@ -31,6 +15,7 @@ import {
   updateDoc,
   serverTimestamp,
   doc,
+  deleteDoc,
 } from "../../config/firebase.config";
 import { useUserContext } from "../../Context/UserContext";
 import { toast } from "react-toastify";
@@ -39,7 +24,24 @@ import { useDebounce } from "use-debounce";
 import UserModalComp from "../LoginUserModal/UserModal";
 import { Tooltip } from "react-tooltip";
 import { IoSettingsOutline } from "react-icons/io5";
-import { MdDelete } from "react-icons/md";
+import { MdOutlineDeleteSweep } from "react-icons/md";
+
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  Message,
+  MessageInput,
+  Sidebar,
+  Search,
+  Conversation,
+  Avatar,
+  ConversationList,
+  ConversationHeader,
+  Loader,
+  TypingIndicator,
+} from "@chatscope/chat-ui-kit-react";
 
 function UserChat() {
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -48,6 +50,7 @@ function UserChat() {
   const [chatContainerStyle, setChatContainerStyle] = useState({});
   const [conversationContentStyle, setConversationContentStyle] = useState({});
   const [conversationAvatarStyle, setConversationAvatarStyle] = useState({});
+  const [searchStyle, setSearchStyle] = useState({});
   const [loading, setLoading] = useState(true);
   const [loginUser, setLoginUser] = useState({});
   const [chats, setChats] = useState([]);
@@ -68,12 +71,32 @@ function UserChat() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const chatIdParam = searchParams.get("chatId");
+    if (chatIdParam) {
+      const selectedChat = chats.find((chat) => chat.id === chatIdParam);
+      if (selectedChat) {
+        setCurrentChat(selectedChat);
+        getAllMessages(); // Fetch messages for the selected chat
+      }
+    } else {
+      // Default to the first chat if no chatIdParam is present
+      if (chats.length > 0) {
+        const defaultChat = chats[0];
+        setCurrentChat(defaultChat);
+        searchParams.set("chatId", defaultChat.id);
+        navigate(`/chat/?${searchParams}`);
+        getAllMessages(); // Fetch messages for the default chat
+      }
+    }
+  }, [searchParams, chats]);
+
   const handleBackClick = () => setSidebarVisible(!sidebarVisible);
   const handleConversationClick = useCallback(() => {
     if (sidebarVisible) {
       setSidebarVisible(false);
     }
-  }, [sidebarVisible, setSidebarVisible]);
+  }, [sidebarVisible]);
 
   useEffect(() => {
     if (sidebarVisible) {
@@ -86,6 +109,9 @@ function UserChat() {
       setConversationContentStyle({
         display: "flex",
       });
+      setSearchStyle({
+        display: "flex",
+      });
       setConversationAvatarStyle({
         marginRight: "1em",
       });
@@ -94,11 +120,13 @@ function UserChat() {
       });
     } else {
       setSidebarStyle({});
+      setSearchStyle({});
       setConversationContentStyle({});
       setConversationAvatarStyle({});
       setChatContainerStyle({});
     }
   }, [
+    setSearchStyle,
     sidebarVisible,
     setSidebarVisible,
     setConversationContentStyle,
@@ -112,7 +140,6 @@ function UserChat() {
     const currentUserDocRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(currentUserDocRef);
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data());
       setLoginUser({ ...docSnap.data(), id: docSnap.id });
       setLoading(false);
     } else {
@@ -131,10 +158,24 @@ function UserChat() {
       querySnapshot.forEach((doc) => {
         usersChat.push({ ...doc.data(), id: doc.id });
       });
-      searchParams.set("chatId", usersChat[0].id);
-      navigate(`/chat/?${searchParams}`);
       setChats(usersChat);
-      setCurrentChat(usersChat[0]);
+      // Check if we have a chatId in the params
+      const chatIdParam = searchParams.get("chatId");
+      if (chatIdParam) {
+        const selectedChat = usersChat.find((chat) => chat.id === chatIdParam);
+        if (selectedChat) {
+          setCurrentChat(selectedChat);
+          getAllMessages();
+        }
+      } else {
+        if (usersChat.length > 0) {
+          const defaultChat = usersChat[0];
+          setCurrentChat(defaultChat);
+          searchParams.set("chatId", defaultChat.id);
+          navigate(`/chat/?${searchParams}`);
+          getAllMessages();
+        }
+      }
       setLoading(false);
     });
   };
@@ -148,33 +189,47 @@ function UserChat() {
   };
 
   // Sending Message
-  const onSend = () => {
+  const onSend = async () => {
+    const newMessage = {
+      message: messageInputValue,
+      sentTime: new Date().toISOString(),
+      sender: user.uid,
+      receiver: currentChat.id,
+      chatId: chatId(currentChat.id),
+      timeStamp: serverTimestamp(),
+      sending: true,
+    };
+
+    setChatMessages((prevMessages) => [...prevMessages, newMessage]);
     setMessageInputValue("");
+
     try {
-      addDoc(collection(db, "messages"), {
-        message: messageInputValue,
-        sentTime: new Date().toISOString(),
-        sender: user.uid,
-        receiver: currentChat.id,
-        chatId: chatId(currentChat.id),
-        timeStamp: serverTimestamp(),
-      });
+      const docRef = await addDoc(collection(db, "messages"), newMessage);
+      await updateDoc(doc(db, "messages", docRef.id), { sending: false });
+      setChatMessages((prevMessages) =>
+        prevMessages.map((msg) =>
+          msg.sentTime === newMessage.sentTime
+            ? { ...msg, sending: false }
+            : msg
+        )
+      );
 
       updateDoc(doc(db, "users", currentChat.id), {
         [`lastMessages.${chatId(currentChat.id)}`]: {
-          lastMessage: messageInputValue,
+          lastMessage: newMessage.message,
           chatId: chatId(currentChat.id),
         },
       });
       updateDoc(doc(db, "users", user.uid), {
         [`lastMessages.${chatId(currentChat.id)}`]: {
-          lastMessage: messageInputValue,
+          lastMessage: newMessage.message,
           chatId: chatId(currentChat.id),
         },
       });
+
       toast.success("Message Sent!");
     } catch (error) {
-      console.log("Please try again.", error);
+      toast.error("Message sending failed!");
     }
   };
 
@@ -199,7 +254,9 @@ function UserChat() {
   };
 
   useEffect(() => {
-    getAllMessages();
+    if (currentChat.id) {
+      getAllMessages();
+    }
   }, [currentChat]);
 
   // Logout User
@@ -213,10 +270,23 @@ function UserChat() {
     }
   };
 
-  //Modal Fn
+  // Modal Fn
   const handleOpen = () => setOpen(!open);
 
-  //Searching user
+  // Deleting a message
+  const handleDelete = async (messageId) => {
+    try {
+      await deleteDoc(doc(db, "messages", messageId));
+      setChatMessages((prevMessages) =>
+        prevMessages.filter((msg) => msg.id !== messageId)
+      );
+      toast.success("Message deleted!");
+    } catch (error) {
+      toast.error("Failed to delete message!");
+    }
+  };
+
+  // Searching user
   useEffect(() => {
     if (searchUser === "") {
       setFilteredChats(chats);
@@ -268,7 +338,7 @@ function UserChat() {
               <IoSettingsOutline
                 onClick={handleOpen}
                 data-tooltip-id="infoTooltip"
-                data-tooltip-content="Accout Settings"
+                data-tooltip-content="Account Settings"
                 className="text-sertiary"
                 cursor={"pointer"}
                 size={30}
@@ -277,6 +347,7 @@ function UserChat() {
             </ConversationHeader.Actions>
           </ConversationHeader>
           <Search
+            style={searchStyle}
             placeholder="Search..."
             value={searchUser}
             onClearClick={() => setSearchUser("")}
@@ -329,6 +400,17 @@ function UserChat() {
               <TypingIndicator content={`${loginUser.userName}`} />
             }
           >
+            {chatMessages.length === 0 ? (
+              <Message
+                className="text-2xl font-medium text-center flex justify-center items-center h-screen"
+                model={{
+                  message: `Start a Conversation! Connect and  chat with your friends
+                anytime.`,
+                }}
+              />
+            ) : (
+              ""
+            )}
             {chatMessages.map((v, i) => (
               <Message key={i} model={v}>
                 <Avatar
@@ -339,13 +421,31 @@ function UserChat() {
                   }`}
                 />
                 <Message.Footer
-                  sentTime={formatDistance(new Date(v.sentTime), new Date(), {
-                    addSuffix: true,
-                  })}
+                  sender={
+                    v.sender === user.uid && (
+                      <MdOutlineDeleteSweep
+                        size={20}
+                        data-tooltip-id="deleteTooltip"
+                        data-tooltip-content="Delete chat"
+                        onClick={() => handleDelete(v.id)}
+                        cursor="pointer"
+                        title="Delete Message"
+                      />
+                    )
+                  }
+                  sentTime={
+                    v.sending
+                      ? "sending..."
+                      : formatDistance(new Date(v.sentTime), new Date(), {
+                          addSuffix: true,
+                        })
+                  }
                 />
               </Message>
             ))}
+            <Tooltip id="deleteTooltip" />
           </MessageList>
+
           <MessageInput
             placeholder="Type message here..."
             value={messageInputValue}

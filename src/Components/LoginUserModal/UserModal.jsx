@@ -120,9 +120,7 @@ export default function UserModalComp({ open, setOpen, handleOpen }) {
           </form>
         </DialogBody>
         <DialogFooter>
-          <Button onClick={handleOpen} className="mr-1">
-            <span>Cancel</span>
-          </Button>
+          <ButtonComp title="Cancel" btnClick={handleOpen} />
         </DialogFooter>
       </Dialog>
     </>
