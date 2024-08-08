@@ -42,6 +42,23 @@ body {
   color: #f3f3f3;
 }
 
+.cs-search,
+.cs-search__input,
+.cs-message-input__content-editor[data-placeholder]:empty:before,
+.cs-message-input__content-editor,
+.cs-message-input__content-editor-wrapper {
+  background-color: #9ab3e3 !important;
+  font-weight: 600 !important;
+  color: #f3f3f3 !important;
+}
+.cs-search__input::placeholder,
+.cs-search__search-icon,
+.cs-search__clear-icon,
+.cs-button--videocall,
+.cs-button--voicecall {
+  color: #f3f3f3 !important;
+}
+
 .cs-message--outgoing .cs-message__sent-time {
   display: block !important;
 }
@@ -50,7 +67,9 @@ body {
   display: block !important;
 }
 
-.cs-message__footer .cs-message__sent-time {
+.cs-message__footer .cs-message__sent-time,
+.cs-button--attachment,
+.cs-button--send {
   color: #092a5d;
   font-weight: 800 !important;
 }

@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { SiGnuprivacyguard } from "react-icons/si";
 import { AiOutlineLogin } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import FloatBtnComp from "../../Components/FloatButton/FloatBtn";
 
 function UserSignupPage() {
   const [type, setType] = useState("Sign up");
@@ -248,6 +249,7 @@ function UserSignupPage() {
           </Card>
         </div>
       </div>
+      <FloatBtnComp />
     </div>
   );
 }

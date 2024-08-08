@@ -1,6 +1,21 @@
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
-import { formatDistance } from "date-fns";
-import { RiLogoutCircleLine } from "react-icons/ri";
+import { useState, useEffect, useCallback } from "react";
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList,
+  Message,
+  MessageInput,
+  Sidebar,
+  Search,
+  Conversation,
+  Avatar,
+  ConversationList,
+  VoiceCallButton,
+  VideoCallButton,
+  ConversationHeader,
+  Loader,
+  TypingIndicator,
+} from "@chatscope/chat-ui-kit-react";
 import {
   auth,
   signOut,
@@ -18,6 +33,8 @@ import {
   deleteDoc,
 } from "../../config/firebase.config";
 import { useUserContext } from "../../Context/UserContext";
+import { formatDistance } from "date-fns";
+import { RiLogoutCircleLine } from "react-icons/ri";
 import { toast } from "react-toastify";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
@@ -25,23 +42,8 @@ import UserModalComp from "../LoginUserModal/UserModal";
 import { Tooltip } from "react-tooltip";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineDeleteSweep } from "react-icons/md";
-
+import FloatBtnComp from "../FloatButton/FloatBtn";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  Sidebar,
-  Search,
-  Conversation,
-  Avatar,
-  ConversationList,
-  ConversationHeader,
-  Loader,
-  TypingIndicator,
-} from "@chatscope/chat-ui-kit-react";
 
 function UserChat() {
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -394,6 +396,18 @@ function UserChat() {
               name={`${currentChat.userName}`}
             />
             <ConversationHeader.Content userName={`${currentChat.userName}`} />
+            <ConversationHeader.Actions>
+              <VoiceCallButton
+                data-tooltip-id="voiceCallBtn"
+                data-tooltip-content="Voice Calls"
+              />
+              <Tooltip id="voiceCallBtn"></Tooltip>
+              <VideoCallButton
+                data-tooltip-id="videoCallBtn"
+                data-tooltip-content="Video Calls"
+              />
+              <Tooltip id="videoCallBtn"></Tooltip>
+            </ConversationHeader.Actions>
           </ConversationHeader>
           <MessageList
             typingIndicator={
@@ -445,7 +459,6 @@ function UserChat() {
             ))}
             <Tooltip id="deleteTooltip" />
           </MessageList>
-
           <MessageInput
             placeholder="Type message here..."
             value={messageInputValue}
@@ -455,6 +468,7 @@ function UserChat() {
         </ChatContainer>
       </MainContainer>
       <UserModalComp open={open} setOpen={setOpen} handleOpen={handleOpen} />
+      <FloatBtnComp />
     </div>
   );
 }
