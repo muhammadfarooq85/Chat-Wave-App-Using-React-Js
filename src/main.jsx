@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { UserContextProvider } from "./Context/UserContext.jsx";
 import "./index.scss";
-import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -24,9 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         theme="dark"
       />
       <UserContextProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <App />
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>

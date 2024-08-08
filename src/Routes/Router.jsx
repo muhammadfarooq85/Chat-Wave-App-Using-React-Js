@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, BrowserRouter } from "react-router-dom";
 import UserSignupPage from "../Pages/SignupLogin/SignupLogin";
 import ChatPage from "../Pages/Chat/Chat";
 import { useEffect, useState } from "react";
@@ -30,14 +30,16 @@ function RouterComp() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<UserSignupPage />} />
-      <Route
-        path="/chat"
-        element={isUser ? <ChatPage /> : <Navigate to="/" />}
-      />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<UserSignupPage />} />
+        <Route
+          path="/chat"
+          element={isUser ? <ChatPage /> : <Navigate to="/" />}
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
