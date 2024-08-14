@@ -62,23 +62,23 @@ function UserSignupPage() {
       });
   };
 
-  //Sign in user
-  const onSubmitSignIn = async (data) => {
-    let { userSigninEmail, userSigninPassword } = data;
-    await signInWithEmailAndPassword(auth, userSigninEmail, userSigninPassword)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        toast.success("Sign-in successful!");
-        navigate("/chat");
-        userSigninEmail = "";
-        userSigninPassword = "";
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        toast.error("Invalid password or email.");
-      });
-  };
+    //Sign in user
+    const onSubmitSignIn = async (data) => {
+      let { userSigninEmail, userSigninPassword } = data;
+      await signInWithEmailAndPassword(auth, userSigninEmail, userSigninPassword)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          toast.success("Sign-in successful!");
+          navigate("/chat");
+          userSigninEmail = "";
+          userSigninPassword = "";
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          toast.error("Invalid password or email.");
+        });
+    };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 ml-10 mr-10">
