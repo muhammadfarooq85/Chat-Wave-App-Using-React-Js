@@ -167,7 +167,7 @@ function UserSignupPage() {
                       pattern: {
                         value: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                         message:
-                          "Password must be at least 8 to 20 characters long. It must be only letters, special characters and numbers.",
+                          "Password must be at least 8 to 20 characters long. It must contain at least one letter, one special character and one digit.",
                       },
                     })}
                   />
