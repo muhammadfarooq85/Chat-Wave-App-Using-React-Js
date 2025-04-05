@@ -165,9 +165,9 @@ function UserSignupPage() {
                     {...registerSignUp("userSignupPassword", {
                       required: "Password is required.",
                       pattern: {
-                        value: /^(?=.*[A-Z])[0-9A-Z]{8,10}$/,
+                        value: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                         message:
-                          "Password must be at least 8 to 10 characters long with at least one UpperCase letter",
+                          "Password must be at least 8 to 20 characters long. It must be only letters, special characters and numbers.",
                       },
                     })}
                   />
