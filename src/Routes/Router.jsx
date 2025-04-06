@@ -32,7 +32,10 @@ function RouterComp() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<UserSignupPage />} />
+        <Route
+          path="/"
+          element={isUser ? <Navigate to="/chat" /> : <UserSignupPage />}
+        />
         <Route
           path="/chat"
           element={isUser ? <ChatPage /> : <Navigate to="/" />}
