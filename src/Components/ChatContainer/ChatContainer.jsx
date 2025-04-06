@@ -396,18 +396,6 @@ function UserChat() {
               name={`${currentChat.userName}`}
             />
             <ConversationHeader.Content userName={`${currentChat.userName}`} />
-            <ConversationHeader.Actions>
-              <VoiceCallButton
-                data-tooltip-id="voiceCallBtn"
-                data-tooltip-content="Voice Calls"
-              />
-              <Tooltip id="voiceCallBtn"></Tooltip>
-              <VideoCallButton
-                data-tooltip-id="videoCallBtn"
-                data-tooltip-content="Video Calls"
-              />
-              <Tooltip id="videoCallBtn"></Tooltip>
-            </ConversationHeader.Actions>
           </ConversationHeader>
           <MessageList
             typingIndicator={
@@ -468,7 +456,6 @@ function UserChat() {
         </ChatContainer>
       </MainContainer>
       <UserModalComp open={open} setOpen={setOpen} handleOpen={handleOpen} />
-      <FloatBtnComp />
     </div>
   );
 }
