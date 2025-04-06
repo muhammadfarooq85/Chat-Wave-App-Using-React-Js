@@ -3,8 +3,8 @@ import { MdShare } from "react-icons/md";
 import SocialShareComp from "../Share/SocialShare";
 
 function FloatBtnComp({ clickOnFloatBtn }) {
-  const shareUrl = "https://chat-wave.vercel.app/";
-  const shareTitle = "A free and easy tool for Chat!";
+  const shareUrl = "https://chatt-wave.vercel.app";
+  const shareTitle = "A free and easy tool for real time Chat.";
 
   const content = <SocialShareComp url={shareUrl} title={shareTitle} />;
 
