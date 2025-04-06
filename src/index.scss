@@ -84,14 +84,36 @@ body {
 }
 
 //Loader Css
-.cs-loader {
-  font-size: 50px !important;
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
-.cs-loader::before {
-  border-color: #9ab3e3 !important;
+
+.loader {
+  width: 120px;
+  height: 22px;
+  border-radius: 20px;
+  color: #123d82;
+  border: 2px solid;
+  position: relative;
 }
-.cs-loader::after {
-  border-color: #4a79ca transparent transparent !important;
+
+.loader::before {
+  content: "";
+  position: absolute;
+  margin: 2px;
+  inset: 0 100% 0 0;
+  border-radius: inherit;
+  background: currentColor;
+  animation: l6 2s infinite;
+}
+
+@keyframes l6 {
+  100% {
+    inset: 0;
+  }
 }
 
 //Media Queries

@@ -3,7 +3,7 @@ import UserSignupPage from "../Pages/SignupLogin/SignupLogin";
 import ChatPage from "../Pages/Chat/Chat";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, auth } from "../config/firebase.config";
-import { Loader } from "@chatscope/chat-ui-kit-react";
+import LoaderComp from "../Components/Loader/Loader";
 
 function RouterComp() {
   const [isUser, setIsUser] = useState(false);
@@ -23,8 +23,8 @@ function RouterComp() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader />
+      <div className="loader-container">
+        <LoaderComp />
       </div>
     );
   }

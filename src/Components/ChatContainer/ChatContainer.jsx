@@ -13,7 +13,6 @@ import {
   VoiceCallButton,
   VideoCallButton,
   ConversationHeader,
-  Loader,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
 import {
@@ -44,6 +43,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineDeleteSweep } from "react-icons/md";
 import FloatBtnComp from "../FloatButton/FloatBtn";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import LoaderComp from "../Loader/Loader";
 
 function UserChat() {
   const [messageInputValue, setMessageInputValue] = useState("");
@@ -304,8 +304,8 @@ function UserChat() {
   // Showing loader
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader />
+      <div className="loader-container">
+        <LoaderComp />
       </div>
     );
   }
