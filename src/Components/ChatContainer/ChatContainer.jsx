@@ -417,7 +417,7 @@ function UserChat() {
               <Message
                 className="text-2xl font-bold text-center flex justify-center items-center h-screen"
                 model={{
-                  message: `Start a quick conversation with your friends, realtives etc. Please share this app.`,
+                  message: `Start a quick conversation with your friends, relatives etc. Please share this app.`,
                 }}
               />
             ) : (
