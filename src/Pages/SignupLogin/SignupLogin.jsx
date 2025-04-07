@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+// Libraries Imports
+import { useState } from "react";
 import { Card, Typography } from "@material-tailwind/react";
 import { useForm } from "react-hook-form";
-import InputComp from "../../Components/Input/InputComp";
-import ButtonComp from "../../Components/Button/ButtonComp";
+import { toast } from "react-toastify";
+import { SiGnuprivacyguard } from "react-icons/si";
+import { AiOutlineLogin } from "react-icons/ai";
+import { FaCashRegister } from "react-icons/fa6";
+import { FaKeycdn } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
+// Local Imports
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -10,32 +16,35 @@ import {
   db,
   setDoc,
   doc,
-} from "../../config/firebase.config";
-import { toast } from "react-toastify";
-import { SiGnuprivacyguard } from "react-icons/si";
-import { AiOutlineLogin } from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
-import FloatBtnComp from "../../Components/FloatButton/FloatBtn";
+} from "../../Config/firebase.config";
+import InputComp from "../../Components/Input/Input";
+import ButtonComp from "../../Components/Button/Button";
+import FloatBtnComp from "../../Components/FloatButton/FloatButton";
 
 function UserSignupPage() {
   const [type, setType] = useState("Sign up");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isSignin, setIsSignin] = useState(false);
   const navigate = useNavigate();
 
   const {
     register: registerSignUp,
     handleSubmit: handleSubmitSignUp,
     formState: { errors: errorsSignUp },
+    reset: signinFormReset,
   } = useForm();
 
   const {
     register: registerSignIn,
     handleSubmit: handleSubmitSignIn,
     formState: { errors: errorsSignIn },
+    reset: registerFormReset,
   } = useForm();
 
   //Registering User
   const onSubmitSignUp = async (data) => {
-    let { userName, userSignupEmail, userSignupPassword } = data;
+    let { userSignupEmail, userSignupPassword } = data;
+    setIsRegistering(true);
     await createUserWithEmailAndPassword(
       auth,
       userSignupEmail,
@@ -46,39 +55,38 @@ function UserSignupPage() {
         await setDoc(doc(db, "users", res.uid), { ...data, userUid: res.uid });
         toast.success("You are registered successfully!");
         setType("Sign in");
-        userName = "";
-        userSignupPassword = "";
-        userSignupEmail = "";
+        registerFormReset();
       })
       .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
+        const errorCode = error?.code;
         if (errorCode === "auth/email-already-in-use") {
           toast.error("Email already registered. Please login!");
           return;
         }
-        toast.error("Please try again.");
-        console.log(error);
+        toast.error("Please try again!");
+      })
+      .finally(() => {
+        setIsRegistering(false);
       });
   };
 
-    //Sign in user
-    const onSubmitSignIn = async (data) => {
-      let { userSigninEmail, userSigninPassword } = data;
-      await signInWithEmailAndPassword(auth, userSigninEmail, userSigninPassword)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          toast.success("Sign-in successful!");
-          navigate("/chat");
-          userSigninEmail = "";
-          userSigninPassword = "";
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          toast.error("Invalid password or email.");
-        });
-    };
+  // Sign in user
+  const onSubmitSignIn = async (data) => {
+    let { userSigninEmail, userSigninPassword } = data;
+    setIsSignin(true);
+    await signInWithEmailAndPassword(auth, userSigninEmail, userSigninPassword)
+      .then(() => {
+        toast.success("Sign-in successful!");
+        navigate("/chat");
+        signinFormReset();
+      })
+      .catch(() => {
+        toast.error("Invalid password or email!");
+      })
+      .finally(() => {
+        setIsSignin(false);
+      });
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 ml-10 mr-10">
@@ -165,7 +173,8 @@ function UserSignupPage() {
                     {...registerSignUp("userSignupPassword", {
                       required: "Password is required.",
                       pattern: {
-                        value: /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
+                        value:
+                          /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                         message:
                           "Password must be at least 8 to 20 characters long. It must contain at least one letter, one special character and one digit.",
                       },
@@ -177,7 +186,12 @@ function UserSignupPage() {
                     </Typography>
                   )}
                 </div>
-                <ButtonComp title="Sign Up" btnType="submit" />
+                <ButtonComp
+                  title="Sign Up"
+                  btnType="submit"
+                  btnDisabled={isRegistering}
+                  btnIcon={<FaCashRegister size={20} />}
+                />
                 <Typography className="mt-4 text-center text-certiary font-normal">
                   Already have an account?
                   <a
@@ -234,9 +248,14 @@ function UserSignupPage() {
                     </Typography>
                   )}
                 </div>
-                <ButtonComp title="Sign In" btnType="submit" />
+                <ButtonComp
+                  title="Sign In"
+                  btnType="submit"
+                  btnDisabled={isSignin}
+                  btnIcon={<FaKeycdn size={20} />}
+                />
                 <Typography className="mt-4 text-certiary text-center font-normal">
-                  Don't have an account?
+                  {"Don't have an account?"}
                   <a
                     className="ml-1 cursor-pointer text-certiary font-bold"
                     onClick={() => setType("Sign up")}

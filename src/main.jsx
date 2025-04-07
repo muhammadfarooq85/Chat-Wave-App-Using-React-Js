@@ -1,10 +1,13 @@
+// Libraries Imports
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "@material-tailwind/react";
-import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-import { UserContextProvider } from "./Context/UserContext.jsx";
+// Local Imports
+import App from "./App.jsx";
+import { UserContextProvider } from "./Context/UserContext";
+import "react-toastify/dist/ReactToastify.css";
 import "./index.scss";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -23,7 +26,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         theme="dark"
       />
       <UserContextProvider>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </UserContextProvider>
     </ThemeProvider>
   </React.StrictMode>

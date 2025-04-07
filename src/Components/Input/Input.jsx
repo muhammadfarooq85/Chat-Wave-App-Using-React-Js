@@ -1,4 +1,6 @@
-import React, { forwardRef, useState } from "react";
+// Libraries Imports
+import PropTypes from "prop-types";
+import { forwardRef, useState } from "react";
 import { Input } from "@material-tailwind/react";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 
@@ -37,5 +39,10 @@ const InputComp = forwardRef(
     );
   }
 );
+
+InputComp.propTypes = {
+  inputType: PropTypes.string.isRequired,
+  inputPlaceholder: PropTypes.string.isRequired,
+};
 
 export default InputComp;

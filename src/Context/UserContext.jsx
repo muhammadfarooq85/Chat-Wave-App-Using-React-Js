@@ -1,5 +1,8 @@
+// Libraries Imports
+import PropTypes from "prop-types";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, onAuthStateChanged } from "../config/firebase.config";
+// Local Imports
+import { auth, onAuthStateChanged } from "../Config/firebase.config";
 
 const UserContext = createContext();
 
@@ -13,7 +16,7 @@ const UserContextProvider = ({ children }) => {
       if (user) {
         setUser(user);
       } else {
-        console.log("Please login!");
+        setUser(null);
       }
     });
   };
@@ -23,6 +26,10 @@ const UserContextProvider = ({ children }) => {
   }, [user]);
 
   return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+};
+
+UserContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export { useUserContext, UserContextProvider };

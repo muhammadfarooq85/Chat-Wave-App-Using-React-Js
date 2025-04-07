@@ -1,5 +1,5 @@
-// src/SocialShare.js
-import React from "react";
+// Libraries Imports
+import PropTypes from "prop-types";
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -29,5 +29,10 @@ function SocialShareComp({ url, title }) {
     </div>
   );
 }
+
+SocialShareComp.propTypes = {
+  url: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+};
 
 export default SocialShareComp;

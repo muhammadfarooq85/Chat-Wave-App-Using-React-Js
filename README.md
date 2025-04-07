@@ -1,5 +1,7 @@
 # Chat App
 
+## v1.0.0 
+
 A real-time chat application built using React.js and Firebase with Ant Design (AntD) and Material-UI (MUI) for a rich user interface.
 
 ## Table of Contents
@@ -31,10 +33,10 @@ A real-time chat application built using React.js and Firebase with Ant Design (
 ### Snapshots
 
 Signup-login Page
-![Signup-Login](./src//assets/Images/signuplogin.png)
+![Signup-Login](./src/Assets/Images/signuplogin.png)
 
 Chat Page
-![chat](./src//assets/Images/chat.png)
+![chat](./src/Assets/Images/chat.png)
 
 ## Setup
 

@@ -1,11 +1,8 @@
+// Libraries Imports
 import ChatContainerComp from "../../Components/ChatContainer/ChatContainer";
 
 function ChatPage() {
-  return (
-    <div>
-      <ChatContainerComp />
-    </div>
-  );
+  return <ChatContainerComp />;
 }
 
 export default ChatPage;

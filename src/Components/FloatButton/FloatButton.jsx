@@ -1,6 +1,9 @@
+// Libraries Imports
+import PropTypes from "prop-types";
 import { FloatButton, Popover } from "antd";
 import { MdShare } from "react-icons/md";
-import SocialShareComp from "../Share/SocialShare";
+// Local Imports
+import SocialShareComp from "../SocialShare/SocialShare";
 
 function FloatBtnComp({ clickOnFloatBtn }) {
   const shareUrl = "https://chatt-wave.vercel.app";
@@ -14,5 +17,9 @@ function FloatBtnComp({ clickOnFloatBtn }) {
     </Popover>
   );
 }
+
+FloatBtnComp.propTypes = {
+  clickOnFloatBtn: PropTypes.func,
+};
 
 export default FloatBtnComp;

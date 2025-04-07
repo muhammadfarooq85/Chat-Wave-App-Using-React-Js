@@ -1,4 +1,7 @@
+// Libraries Imports
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   MainContainer,
   ChatContainer,
@@ -10,11 +13,17 @@ import {
   Conversation,
   Avatar,
   ConversationList,
-  VoiceCallButton,
-  VideoCallButton,
   ConversationHeader,
   TypingIndicator,
 } from "@chatscope/chat-ui-kit-react";
+import { Tooltip } from "react-tooltip";
+import { toast } from "react-toastify";
+import { formatDistance } from "date-fns";
+import { useDebounce } from "use-debounce";
+import { IoSettingsOutline } from "react-icons/io5";
+import { RiLogoutCircleLine } from "react-icons/ri";
+import { MdOutlineDeleteSweep } from "react-icons/md";
+// Lcoal Imports
 import {
   auth,
   signOut,
@@ -30,19 +39,9 @@ import {
   serverTimestamp,
   doc,
   deleteDoc,
-} from "../../config/firebase.config";
+} from "../../Config/firebase.config";
 import { useUserContext } from "../../Context/UserContext";
-import { formatDistance } from "date-fns";
-import { RiLogoutCircleLine } from "react-icons/ri";
-import { toast } from "react-toastify";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useDebounce } from "use-debounce";
-import UserModalComp from "../LoginUserModal/UserModal";
-import { Tooltip } from "react-tooltip";
-import { IoSettingsOutline } from "react-icons/io5";
-import { MdOutlineDeleteSweep } from "react-icons/md";
-import FloatBtnComp from "../FloatButton/FloatBtn";
-import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+import AccountSettingsModal from "../AccountSettingsModal/AccountSettingsModal";
 import LoaderComp from "../Loader/Loader";
 
 function UserChat() {
@@ -155,7 +154,7 @@ function UserChat() {
       collection(db, "users"),
       where("userSignupEmail", "!=", user.email)
     );
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       let usersChat = [];
       querySnapshot.forEach((doc) => {
         usersChat.push({ ...doc.data(), id: doc.id });
@@ -242,7 +241,7 @@ function UserChat() {
       where("chatId", "==", chatId(currentChat.id)),
       orderBy("timeStamp", "asc")
     );
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
       const messages = [];
       querySnapshot.forEach((doc) => {
         messages.push({
@@ -321,10 +320,14 @@ function UserChat() {
         <Sidebar position="left" scrollable={false} style={sidebarStyle}>
           <ConversationHeader>
             <Avatar
-              src={`https://ui-avatars.com/api/?background=random&color=fff&name=${loginUser.userName}`}
-              name={`${loginUser.userName}`}
+              src={`https://ui-avatars.com/api/?background=random&color=fff&name=${
+                loginUser?.userName ?? "loading..."
+              }`}
+              name={`${loginUser?.userName ?? "loading..."}`}
             />
-            <ConversationHeader.Content userName={`${loginUser.userName}`} />
+            <ConversationHeader.Content
+              userName={`${loginUser?.userName ?? "loading..."}`}
+            />
             <ConversationHeader.Actions className="flex justify-center items-center gap-2">
               <RiLogoutCircleLine
                 onClick={logout}
@@ -356,29 +359,31 @@ function UserChat() {
             onChange={(e) => setSearchUser(e)}
           />
           <ConversationList>
-            {filteredChats.map((v) => (
+            {filteredChats?.map((user) => (
               <Conversation
                 style={{
                   backgroundColor:
-                    searchParams.get("chatId") === v.id ? "#f3f3f3" : "",
+                    searchParams.get("chatId") === user?.id ? "#f3f3f3" : "",
                 }}
-                key={v.id}
+                key={user?.id}
                 onClick={() => {
                   handleConversationClick();
-                  setCurrentChat(v);
-                  searchParams.set("chatId", v.id);
+                  setCurrentChat(user);
+                  searchParams.set("chatId", user?.id);
                   navigate(`/chat/?${searchParams}`);
                 }}
               >
                 <Avatar
-                  src={`https://ui-avatars.com/api/?background=random&color=fff&name=${v.userName}`}
-                  name={`${v.userName}`}
+                  src={`https://ui-avatars.com/api/?background=random&color=fff&name=${user?.userName}`}
+                  name={`${user?.userName ?? "loading..."}`}
                   status="available"
                   style={conversationAvatarStyle}
                 />
                 <Conversation.Content
-                  name={`${v.userName}`}
-                  info={`${v?.lastMessages?.[chatId(v.id)]?.lastMessage || ""}`}
+                  name={`${user?.userName}`}
+                  info={`${
+                    user?.lastMessages?.[chatId(user?.id)]?.lastMessage || ""
+                  }`}
                   style={conversationContentStyle}
                 />
               </Conversation>
@@ -392,55 +397,64 @@ function UserChat() {
               className="backBtn"
             />
             <Avatar
-              src={`https://ui-avatars.com/api/?background=random&color=fff&name=${currentChat.userName}`}
-              name={`${currentChat.userName}`}
+              src={`https://ui-avatars.com/api/?background=random&color=fff&name=${
+                currentChat?.userName || "loading..."
+              }`}
+              name={`${currentChat?.userName || "laoding..."}`}
             />
-            <ConversationHeader.Content userName={`${currentChat.userName}`} />
+            <ConversationHeader.Content
+              userName={`${currentChat?.userName || "loading..."}`}
+            />
           </ConversationHeader>
           <MessageList
             typingIndicator={
-              <TypingIndicator content={`${loginUser.userName}`} />
+              <TypingIndicator
+                content={`${loginUser?.userName || "loading..."}`}
+              />
             }
           >
-            {chatMessages.length === 0 ? (
+            {chatMessages?.length === 0 ? (
               <Message
-                className="text-2xl font-medium text-center flex justify-center items-center h-screen"
+                className="text-2xl font-bold text-center flex justify-center items-center h-screen"
                 model={{
-                  message: `Start a Conversation! Connect and  chat with your friends
-                anytime.`,
+                  message: `Start a quick conversation with your friends, realtives etc. Please share this app.`,
                 }}
               />
             ) : (
               ""
             )}
-            {chatMessages.map((v, i) => (
-              <Message key={i} model={v}>
+            {chatMessages.map((chatMessage, i) => (
+              <Message key={i} model={chatMessage}>
                 <Avatar
                   src={`https://ui-avatars.com/api/?background=random&color=fff&name=${
-                    user.uid === v.sender
-                      ? loginUser.userName
-                      : currentChat.userName
+                    user?.uid === chatMessage?.sender
+                      ? loginUser?.userName
+                      : currentChat?.userName
                   }`}
                 />
                 <Message.Footer
                   sender={
-                    v.sender === user.uid && (
+                    chatMessage?.sender === user?.uid && (
                       <MdOutlineDeleteSweep
                         size={20}
                         data-tooltip-id="deleteTooltip"
                         data-tooltip-content="Delete chat"
-                        onClick={() => handleDelete(v.id)}
+                        onClick={() => handleDelete(chatMessage?.id)}
                         cursor="pointer"
-                        title="Delete Message"
+                        title="Delete message"
                       />
                     )
                   }
                   sentTime={
-                    v.sending
+                    chatMessage.sending
                       ? "sending..."
-                      : formatDistance(new Date(v.sentTime), new Date(), {
-                          addSuffix: true,
-                        })
+                      : formatDistance(
+                          new Date(chatMessage.sentTime),
+                          new Date(),
+                          {
+                            addSuffix: true,
+                          }
+                        )
                   }
                 />
               </Message>
@@ -455,7 +469,11 @@ function UserChat() {
           />
         </ChatContainer>
       </MainContainer>
-      <UserModalComp open={open} setOpen={setOpen} handleOpen={handleOpen} />
+      <AccountSettingsModal
+        open={open}
+        setOpen={setOpen}
+        handleOpen={handleOpen}
+      />
     </div>
   );
 }
