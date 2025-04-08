@@ -356,6 +356,7 @@ function UserChat() {
               src={`https://ui-avatars.com/api/?background=random&color=fff&name=${
                 loginUser?.userName ?? "loading..."
               }`}
+              status={loginUser?.userStatus ?? "available"}
               name={`${loginUser?.userName ?? "loading..."}`}
             />
             <ConversationHeader.Content
@@ -409,7 +410,7 @@ function UserChat() {
                 <Avatar
                   src={`https://ui-avatars.com/api/?background=random&color=fff&name=${user?.userName}`}
                   name={`${user?.userName ?? "loading..."}`}
-                  status="available"
+                  status={user?.userStatus ?? "available"}
                   style={conversationAvatarStyle}
                 />
                 <Conversation.Content
@@ -434,6 +435,7 @@ function UserChat() {
               src={`https://ui-avatars.com/api/?background=random&color=fff&name=${
                 currentChat?.userName || "loading..."
               }`}
+              status={currentChat?.userStatus ?? "available"}
               name={`${currentChat?.userName || "laoding..."}`}
             />
             <ConversationHeader.Content

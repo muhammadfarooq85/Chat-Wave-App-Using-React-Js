@@ -8,7 +8,7 @@ import {
   DialogFooter,
   Typography,
 } from "@material-tailwind/react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { GiCancel } from "react-icons/gi";
 import { RxUpdate } from "react-icons/rx";
@@ -22,8 +22,20 @@ import {
 } from "../../Config/firebase.config";
 import InputComp from "../Input/Input";
 import ButtonComp from "../Button/Button";
+import SelectInputComp from "../SelectInput/SelectInput";
 
 function AccountSettingsModalComp({ open, handleOpen }) {
+  const {
+    handleSubmit: handleSubmitUserStatus,
+    formState: { errors: errorsSubmitUserStatus },
+    reset: userStatusReset,
+    control,
+  } = useForm({
+    defaultValues: {
+      userStatus: "",
+    },
+    mode: "onBlur",
+  });
   const {
     register: changeUserName,
     handleSubmit: handleSubmitUserName,
@@ -36,8 +48,29 @@ function AccountSettingsModalComp({ open, handleOpen }) {
     formState: { errors: errorsSubmitUserPassword },
     reset: passwordReset,
   } = useForm();
-  const [isPasswordChanging, setIsPasswordChanging] = useState(false);
+  const [isUserStatusUpdating, setIsUserStatusUpdating] = useState(false);
   const [isNameChanging, setIsNameChanging] = useState(false);
+  const [isPasswordChanging, setIsPasswordChanging] = useState(false);
+
+  const onSubmitUserStatus = async (data) => {
+    let { userStatus } = data;
+    console.log(userStatus);
+
+    try {
+      setIsUserStatusUpdating(true);
+      const userStatusRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userStatusRef, {
+        userStatus,
+      });
+      handleOpen();
+      toast.success("Your status is updated successfully!");
+      userStatusReset();
+    } catch (error) {
+      toast.error("Please try again!");
+    } finally {
+      setIsUserStatusUpdating(false);
+    }
+  };
 
   const onSubmitUserName = async (data) => {
     let { userName } = data;
@@ -81,6 +114,39 @@ function AccountSettingsModalComp({ open, handleOpen }) {
       <Dialog open={open} handler={handleOpen}>
         <DialogHeader>Account Settings</DialogHeader>
         <DialogBody>
+          <form onSubmit={handleSubmitUserStatus(onSubmitUserStatus)}>
+            <div className="flex flex-col justify-center items-start gap-2">
+              <Controller
+                name="userStatus"
+                control={control}
+                rules={{
+                  required: "Status is required",
+                }}
+                render={({ field }) => (
+                  <SelectInputComp
+                    name={field.name}
+                    isError={!!errorsSubmitUserStatus.userStatus}
+                    value={field.value}
+                    setValue={field.onChange}
+                  />
+                )}
+              />
+              {errorsSubmitUserStatus.userStatus && (
+                <Typography color="red" className="text-sm font-medium">
+                  {errorsSubmitUserStatus.userStatus.message}
+                </Typography>
+              )}
+              <div>
+                <ButtonComp
+                  title="Update Status"
+                  btnType="submit"
+                  classes={"mb-6"}
+                  btnDisabled={isUserStatusUpdating}
+                  btnIcon={<RxUpdate size={20} />}
+                />
+              </div>
+            </div>
+          </form>
           <form onSubmit={handleSubmitUserName(onSubmitUserName)}>
             <div className="flex flex-col justify-center items-start gap-2">
               <div className="w-full">

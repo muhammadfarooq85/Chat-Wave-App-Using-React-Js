@@ -1,6 +1,6 @@
 # Chat App
 
-## v1.0.0 
+## v1.0.2 
 
 A real-time chat application built using React.js and Firebase with Ant Design (AntD) and Material-UI (MUI) for a rich user interface.
 
