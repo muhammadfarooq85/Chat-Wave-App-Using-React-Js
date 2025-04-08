@@ -97,7 +97,7 @@ function AccountSettingsModalComp({ open, handleOpen }) {
                   {errorsSubmitUserName.userName.message}
                 </Typography>
               )}
-              <div className="w-[40%]">
+              <div>
                 <ButtonComp
                   title="Update Name"
                   btnType="submit"
@@ -132,7 +132,7 @@ function AccountSettingsModalComp({ open, handleOpen }) {
                   {errorsSubmitUserPassword.userPassword.message}
                 </Typography>
               )}
-              <div className="w-[40%]">
+              <div>
                 <ButtonComp
                   title="Update Password"
                   btnType="submit"

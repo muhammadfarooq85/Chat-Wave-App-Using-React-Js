@@ -14,7 +14,7 @@ function ButtonComp({
   return (
     <>
       <Button
-        className={`flex items-center justify-center gap-3 bg-primary tracking-wider ${classes}`}
+        className={`flex items-center justify-center gap-3 bg-primary tracking-wider text-sm md:text-md ${classes}`}
         fullWidth
         disabled={btnDisabled}
         type={btnType}
