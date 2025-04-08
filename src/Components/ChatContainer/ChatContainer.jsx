@@ -439,6 +439,17 @@ function UserChat() {
             <ConversationHeader.Content
               userName={`${currentChat?.userName || "loading..."}`}
             />
+            <ConversationHeader.Actions>
+              <h1 className="text-lg md:text-xl text-white">
+                Give a star on{" "}
+                <a
+                  href="https://github.com/muhammadfarooq85/Chat-Wave-App-Using-React-Js"
+                  target="_blank"
+                >
+                  Github⭐
+                </a>
+              </h1>
+            </ConversationHeader.Actions>
           </ConversationHeader>
           <MessageList
             typingIndicator={
