@@ -94,6 +94,15 @@ body {
   margin: 1em 0 0 0 !important;
 }
 
+.cs-conversation__name {
+  font-size: 18px !important;
+  font-weight: bold !important;
+}
+.cs-conversation__info-content {
+  font-size: 14px !important;
+  font-weight: normal !important;
+}
+
 // chat scrollbar css
 .ps__thumb-y {
   background-color: #4a79ca !important;

@@ -396,7 +396,7 @@ function UserChat() {
               <Conversation
                 style={{
                   backgroundColor:
-                    searchParams.get("chatId") === user?.id ? "#f3f3f3" : "",
+                    searchParams.get("chatId") === user?.id ? "#d2d2d2" : "",
                 }}
                 key={user?.id}
                 onClick={() => {
@@ -413,9 +413,10 @@ function UserChat() {
                   style={conversationAvatarStyle}
                 />
                 <Conversation.Content
-                  name={`${user?.userName}`}
+                  name={`${user?.userName || "loading..."}`}
                   info={`${
-                    user?.lastMessages?.[chatId(user?.id)]?.lastMessage || ""
+                    user?.lastMessages?.[chatId(user?.id)]?.lastMessage ||
+                    "No last mesage yet"
                   }`}
                   style={conversationContentStyle}
                 />
