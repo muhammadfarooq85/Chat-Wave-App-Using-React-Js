@@ -1,5 +1,5 @@
 // Libraries Imports
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
@@ -40,7 +40,7 @@ import {
   doc,
   deleteDoc,
 } from "../../Config/firebase.config";
-import { useUserContext } from "../../Context/UserContext";
+import { UserContext } from "../../Context/UserContext";
 import AccountSettingsModal from "../AccountSettingsModal/AccountSettingsModal";
 import LoaderComp from "../Loader/Loader";
 
@@ -59,18 +59,18 @@ function UserChat() {
   const [chatMessages, setChatMessages] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [value] = useDebounce(messageInputValue, 2000);
+  const [value] = useDebounce(messageInputValue, 4000);
   const [open, setOpen] = useState(false);
   const [searchUser, setSearchUser] = useState("");
   const [filteredChats, setFilteredChats] = useState([]);
-  const user = useUserContext();
+  const { user, isUser } = useContext(UserContext);
 
   useEffect(() => {
-    if (user) {
+    if (isUser) {
       getCurrentUsersChats();
       getCurrentLoginUser();
     }
-  }, [user]);
+  }, [isUser]);
 
   useEffect(() => {
     const chatIdParam = searchParams.get("chatId");
@@ -78,16 +78,15 @@ function UserChat() {
       const selectedChat = chats.find((chat) => chat.id === chatIdParam);
       if (selectedChat) {
         setCurrentChat(selectedChat);
-        getAllMessages(); // Fetch messages for the selected chat
+        getAllMessages();
       }
     } else {
-      // Default to the first chat if no chatIdParam is present
       if (chats.length > 0) {
         const defaultChat = chats[0];
         setCurrentChat(defaultChat);
         searchParams.set("chatId", defaultChat.id);
         navigate(`/chat/?${searchParams}`);
-        getAllMessages(); // Fetch messages for the default chat
+        getAllMessages();
       }
     }
   }, [searchParams, chats]);
@@ -152,7 +151,7 @@ function UserChat() {
   const getCurrentUsersChats = async () => {
     const q = query(
       collection(db, "users"),
-      where("userSignupEmail", "!=", user.email)
+      where("userSignupEmail", "!=", user?.email)
     );
     onSnapshot(q, (querySnapshot) => {
       let usersChat = [];
@@ -260,16 +259,36 @@ function UserChat() {
     }
   }, [currentChat]);
 
-  // Logout User
-  const logout = () => {
-    try {
-      signOut(auth);
-      toast.success("Logout successfully!");
-      navigate("/");
-    } catch (error) {
-      toast.error("Please try again!");
+  const setTyping = async (typing) => {
+    const isTyping =
+      currentChat?.isTyping?.[chatId(currentChat?.id)]?.[user?.uid];
+
+    if (!isTyping && typing) {
+      await updateDoc(doc(db, "users", currentChat?.id), {
+        [`isTyping.${chatId(currentChat?.id)}.${user?.uid}`]: typing,
+      });
+      await updateDoc(doc(db, "users", user?.uid), {
+        [`isTyping.${chatId(currentChat?.id)}.${user?.uid}`]: typing,
+      });
+    }
+    if (!typing) {
+      await updateDoc(doc(db, "users", currentChat?.id), {
+        [`isTyping.${chatId(currentChat?.id)}.${user?.uid}`]: typing,
+      });
+      await updateDoc(doc(db, "users", user?.uid), {
+        [`isTyping.${chatId(currentChat?.id)}.${user?.uid}`]: typing,
+      });
     }
   };
+
+  useEffect(() => {
+    if (messageInputValue) {
+      setTyping(true);
+    }
+    if (value === messageInputValue) {
+      setTyping(false);
+    }
+  }, [messageInputValue, value]);
 
   // Modal Fn
   const handleOpen = () => setOpen(!open);
@@ -299,6 +318,20 @@ function UserChat() {
       );
     }
   }, [searchUser, chats]);
+
+  const isTyping =
+    currentChat?.isTyping?.[chatId(currentChat.id)]?.[currentChat.id];
+
+  // Logout User
+  const logout = () => {
+    try {
+      signOut(auth);
+      toast.success("Logout successfully!");
+      navigate("/");
+    } catch (error) {
+      toast.error("Please try again!");
+    }
+  };
 
   // Showing loader
   if (loading) {
@@ -408,9 +441,15 @@ function UserChat() {
           </ConversationHeader>
           <MessageList
             typingIndicator={
-              <TypingIndicator
-                content={`${loginUser?.userName || "loading..."}`}
-              />
+              isTyping ? (
+                <TypingIndicator
+                  content={`${
+                    loginUser?.userName + " is typing" || "loading..."
+                  }`}
+                />
+              ) : (
+                false
+              )
             }
           >
             {chatMessages?.length === 0 ? (
