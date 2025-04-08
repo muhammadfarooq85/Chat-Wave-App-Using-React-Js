@@ -4,13 +4,13 @@ import { Navigate, Route, Routes } from "react-router-dom";
 // Local Imports
 import { onAuthStateChanged, auth } from "../Config/firebase.config";
 import LoaderComp from "../Components/Loader/Loader";
+import NotFoundPage from "../Pages/404/NoFound";
 const SignupLoginPage = lazy(() => import("../Pages/SignupLogin/SignupLogin"));
 const ChatPage = lazy(() => import("../Pages/Chat/Chat"));
 
 function RouterComp() {
   const [isUser, setIsUser] = useState(false);
   const [loading, setLoading] = useState(true);
-  console.log("Hello...");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -49,7 +49,7 @@ function RouterComp() {
           path="/chat"
           element={isUser ? <ChatPage /> : <Navigate to="/" />}
         />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );
